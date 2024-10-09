@@ -21,7 +21,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('photo_service_api.urls')),
+    path('api/', include('photoapp_api.urls')),
 ]
 
 if settings.DEBUG:

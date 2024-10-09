@@ -1,0 +1,49 @@
+version: "3"
+
+services:
+  web:
+    restart: always
+    container_name: "host"
+    build:
+      context: .
+      dockerfile: dockerfile.local
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./photoapp:/app
+    depends_on:
+      - db
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=${DB_PORT}
+      - SECRET_KEY=${SECRET_KEY}
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+      - DEBUG=${DEBUG}
+      - PYTHONUNBUFFERED=1
+    networks:
+      - django_network
+
+  db:
+    restart: always
+    image: postgres:16
+    container_name: "db"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - django_network
+
+networks:
+  django_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
