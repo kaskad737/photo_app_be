@@ -41,7 +41,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'rest_framework_simplejwt',
-    'photoapp_api.apps.PhotoappApiConfig',
+    'authapp.apps.AuthappConfig',
+    'imageapp.apps.ImageappConfig',
+    'statisticsapp.apps.StatisticsappConfig',
+    'workdayapp.apps.WorkdayappConfig',
 ]
 
 MIDDLEWARE = [
@@ -149,3 +152,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Также добавьте параметр SITE_URL для генерации полных ссылок в QR-кодах
+SITE_URL = 'http://test.com'

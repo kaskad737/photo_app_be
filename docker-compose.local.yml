@@ -2,7 +2,7 @@ version: "3"
 
 services:
   web:
-    restart: always
+    restart: unless-stopped
     container_name: "host"
     build:
       context: .
@@ -27,7 +27,7 @@ services:
       - django_network
 
   db:
-    restart: always
+    restart: unless-stopped
     image: postgres:16
     container_name: "db"
     environment:

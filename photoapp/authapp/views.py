@@ -1,22 +1,17 @@
 from django.contrib.auth.models import User
 from rest_framework.generics import (
-    # GenericAPIView,
     CreateAPIView,
     ListAPIView,
-    # ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework import status
-# from rest_framework.response import Response
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
     TokenVerifyView,
 )
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
-# from rest_framework.exceptions import PermissionDenied
 from drf_spectacular.utils import extend_schema, extend_schema_view
-# from django.shortcuts import get_object_or_404
 from .serializers import (
     MyTokenObtainPairSerializer,
     RegisterSerializer,
