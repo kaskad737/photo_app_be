@@ -1,6 +1,6 @@
 from typing import Any
 from django.core.management import BaseCommand
-from django.contrib.auth.models import User
+from authapp.models import User
 import logging
 
 log = logging.getLogger(__name__)
