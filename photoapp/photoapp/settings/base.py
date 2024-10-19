@@ -164,3 +164,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Также добавьте параметр SITE_URL для генерации полных ссылок в QR-кодах
 SITE_URL = 'http://test.com'
+
+AUTH_USER_MODEL = 'authapp.User'
