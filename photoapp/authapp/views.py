@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from authapp.models import User
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
