@@ -23,6 +23,34 @@ services:
       - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
       - DEBUG=${DEBUG}
       - PYTHONUNBUFFERED=1
+      - REDIS_HOST=redis_db
+    networks:
+      - django_network
+
+  celery:
+    restart: unless-stopped
+    container_name: "celery"
+    build:
+      context: .
+      dockerfile: dockerfile_celery
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./photoapp:/app
+    depends_on:
+      - db
+      - redis_db
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=${DB_PORT}
+      - SECRET_KEY=${SECRET_KEY}
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+      - DEBUG=${DEBUG}
+      - PYTHONUNBUFFERED=1
+      - REDIS_HOST=redis_db
     networks:
       - django_network
 
@@ -38,6 +66,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - django_network
+
+  redis_db:
+    restart: unless-stopped
+    image: "redis:latest"
+    container_name: "redis_django"
+    ports:
+      - "6379:6379"
     networks:
       - django_network
 
