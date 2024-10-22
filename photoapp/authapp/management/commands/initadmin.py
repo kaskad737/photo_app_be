@@ -13,6 +13,7 @@ class Command(BaseCommand):
                 username='admin',
                 password='admin',
                 email='testemail@mail.com',
+                is_active=True,
             )
             log.info('Creating account for admin')
         else:
