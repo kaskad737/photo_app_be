@@ -152,15 +152,18 @@ class UserCreatePasswordView(APIView):
             signature = data_unsigner(invitation_signed_token=invitation_signed_token)
             if signature:
                 user = get_object_or_404(User, pk=signature.get("pk"))
-                if user and user.is_invited:
-                    create_password(user_to_update=user, password=password)
-                    return Response(data={"pk": str(user.pk)}, status=status.HTTP_200_OK)
-                elif not user.is_invited:
-                    return Response({"message": "The invitation has been rescinded"}, status=status.HTTP_200_OK)
+                if not user.is_active:
+                    if user and user.is_invited:
+                        create_password(user_to_update=user, password=password)
+                        return Response(data={"pk": str(user.pk)}, status=status.HTTP_200_OK)
+                    elif not user.is_invited:
+                        return Response({"message": "The invitation has been rescinded."}, status=status.HTTP_200_OK)
+                    else:
+                        return Response({"message": "The invitation has expired."}, status=status.HTTP_200_OK)
                 else:
-                    return Response({"message": "The invitation has expired"}, status=status.HTTP_200_OK)
+                    return Response({"message": "User already activated."}, status=status.HTTP_200_OK)
             else:
-                return Response({"message": "Signature does not match"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Signature does not match."}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
