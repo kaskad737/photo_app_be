@@ -10,9 +10,9 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> str | None:
         if User.objects.count() == 0:
             User.objects.create_superuser(
-                username='admin',
-                password='admin',
-                email='testemail@mail.com',
+                username='admin@mail.com',
+                password='admin123',
+                email='admin@mail.com',
                 is_active=True,
             )
             log.info('Creating account for admin')
