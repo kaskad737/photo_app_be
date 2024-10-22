@@ -166,3 +166,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SITE_URL = 'http://test.com'
 
 AUTH_USER_MODEL = 'authapp.User'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+FE_HOST = 'http://test.com'
