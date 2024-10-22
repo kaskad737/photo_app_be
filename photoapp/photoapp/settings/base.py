@@ -169,4 +169,4 @@ AUTH_USER_MODEL = 'authapp.User'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-FE_HOST = 'http://test.com'
+FE_HOST = 'http://localhost:8080'
