@@ -1,8 +1,9 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 from rest_framework.validators import UniqueValidator
 from authapp.models import User
 from django.contrib.auth.password_validation import validate_password
+from .utils import password_validation
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -62,6 +63,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+class InvitationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    first_name = serializers.CharField(max_length=30)
+    last_name = serializers.CharField(max_length=30)
+
+
 class UsersListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -72,3 +79,42 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+
+
+class PasswordCheckAndSetSerializer(serializers.Serializer):
+    password1 = serializers.CharField(
+        min_length=8,
+        max_length=64,
+        write_only=True,
+        required=True,
+    )
+    password2 = serializers.CharField(
+        min_length=8,
+        max_length=64,
+        write_only=True,
+        required=True,
+    )
+    invitation = serializers.CharField(required=True)
+
+    class Meta:
+        fields = ["password1", "password2"]
+
+    def validate(self, attrs):
+        """
+        Validate the provided attributes.
+
+        Checks if the provided passwords match and are valid.
+        """
+        password1 = attrs.get("password1")
+        password2 = attrs.get("password2")
+
+        if password1 != password2:
+            raise exceptions.AuthenticationFailed({"message": "The passwords don't match. Please try again."})
+
+        password_validation(password=password1)
+
+        return attrs
+
+
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
