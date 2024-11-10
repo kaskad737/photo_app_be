@@ -1,5 +1,4 @@
 import os
-import qrcode
 from django.conf import settings
 from django.http import FileResponse
 from rest_framework import status
@@ -8,53 +7,55 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from .models import Photo, Frame
 from .serializers import PhotoSerializer, FrameSerializer
+from .utils import insert_photo_to_frame, create_qr_code, add_qr_code_to_image
 from rest_framework.reverse import reverse
-from django.core.files import File
+from django.http import HttpResponse
 
 
 class UploadPhotoView(APIView):
     def post(self, request, *args, **kwargs):
+        frame_id = self.request.data.get('frame_id')
+        frame_instance = Frame.objects.filter(id=frame_id).first()
+
         qs_serializer = PhotoSerializer(
             data={
-                'photo': request.FILES.get('file')
+                'photo': request.FILES.get('file'),
+                'uploaded_by': self.request.user.id
             },
             context={'request': request}
         )
 
-        if qs_serializer.is_valid():
+        if qs_serializer.is_valid() and frame_instance:
             photo_instance = qs_serializer.save()
             download_url = reverse('imageapp:download-photo', args=[photo_instance.id])
             absolute_download_url = request.build_absolute_uri(download_url)
 
-            qr = qrcode.QRCode(
-                version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=10,
-                border=4,
+            # insert photo to our frame
+            insert_photo_to_frame(
+                photo_instance=photo_instance,
+                frame_path=frame_instance.frame
             )
-            qr.add_data(absolute_download_url)
-            qr.make(fit=True)
 
-            qr_dir = os.path.join(settings.MEDIA_ROOT, 'qrcode')
-            if not os.path.exists(qr_dir):
-                os.makedirs(qr_dir)
-
-            qr_img = qr.make_image(fill='black', back_color='white')
-            qr_path = os.path.join(qr_dir, f'{photo_instance.id}_qr.png')
-            qr_img.save(qr_path)
-
-            with open(qr_path, 'rb') as f:
-                photo_instance.qrcode.save(f'{photo_instance.id}_qr.png', File(f))
-
-            photo_instance.save()
-
-            return Response(
-                {
-                    'message': 'Media uploaded successfully.',
-                    'data': qs_serializer.data,
-                },
-                status=status.HTTP_200_OK,
+            # create qr code for our frame and photo
+            create_qr_code(
+                photo_instance=photo_instance,
+                absolute_download_url=absolute_download_url
             )
+
+            # add qr code to our frame and photo
+            photo_in_frame_with_qr_code_bytes = add_qr_code_to_image(
+                photo_instance=photo_instance
+            )
+
+            return HttpResponse(photo_in_frame_with_qr_code_bytes, content_type="image/png")
+
+            # return Response(
+            #     {
+            #         'message': 'Media uploaded successfully.',
+            #         'data': qs_serializer.data,
+            #     },
+            #     status=status.HTTP_200_OK,
+            # )
 
         else:
             return Response(
@@ -67,8 +68,7 @@ class DownloadPhotoView(APIView):
     def get(self, request, pk, *args, **kwargs):
         try:
             photo = Photo.objects.get(pk=pk)
-            # Путь к файлу на диске
-            file_path = os.path.join(settings.MEDIA_ROOT, photo.photo.name)
+            file_path = os.path.join(settings.MEDIA_ROOT, photo.photo_in_frame.name)
             if os.path.exists(file_path):
                 return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=os.path.basename(file_path))
             return Response({"detail": "Photo not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -80,7 +80,8 @@ class UploadFrameView(APIView):
     def post(self, request, *args, **kwargs):
         frame_serializer = FrameSerializer(
             data={
-                'frame': request.FILES.get('file')
+                'frame': request.FILES.get('file'),
+                'uploaded_by': self.request.user.id
             },
             context={'request': request}
         )

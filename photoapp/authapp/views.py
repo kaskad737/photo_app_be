@@ -75,7 +75,7 @@ class CustomTokenVerifyView(TokenVerifyView):
 class UsersListView(ListAPIView):
     serializer_class = UsersListSerializer
     queryset = User.objects.all().order_by('pk')
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
 
 
 @extend_schema_view(
@@ -222,3 +222,15 @@ class UserDeactivateView(APIView):
         user.is_active = False
         user.save()
         return Response({"message": "User deactivated successfully."}, status=status.HTTP_200_OK)
+
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=['user'],
+        summary='List all active users',
+    ),
+)
+class UsersActiveListView(ListAPIView):
+    serializer_class = UsersListSerializer
+    queryset = User.objects.filter(is_active=True, is_superuser=False).order_by('pk')
+    # permission_classes = [IsAuthenticated]

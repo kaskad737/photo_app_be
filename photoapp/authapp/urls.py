@@ -9,6 +9,7 @@ from .views import (
     UserCreatePasswordView,
     UserCancelInvitationView,
     UserDeactivateView,
+    UsersActiveListView,
 )
 
 app_name = 'authapp'
@@ -22,5 +23,6 @@ urlpatterns = [
     path('user_cancel_invitation/', UserCancelInvitationView.as_view(), name='user-cancel-invitation'),
     path('user_deactivate/', UserDeactivateView.as_view(), name='user-deactivate'),
     path('users/', UsersListView.as_view(), name='users'),
+    path('active_users/', UsersActiveListView.as_view(), name='active-users'),
     path('users/<uuid:pk>/', UserRetrieveUpdateDestroyView.as_view(), name='user-details'),
 ]
