@@ -41,11 +41,12 @@ def insert_photo_to_frame(photo_instance, frame_path):
 def add_qr_code_to_image(photo_instance):
     # Open the framed photo
     framed_photo = Image.open(photo_instance.photo_in_frame.path)
+    qr_code = Image.open(photo_instance.qrcode.path).convert("RGBA")
 
-    # Open the QR code image
-    qr_code = Image.open(photo_instance.qrcode.path).convert("RGBA")  # Ensuring transparency if necessary
-    qr_position = (1000, 1000)
-    # Paste the QR code at the specified position
+    target_width, target_height = 200, 200
+    qr_code = qr_code.resize((target_width, target_height), Image.LANCZOS)
+
+    qr_position = (1200, 950)
     framed_photo.paste(qr_code, qr_position, qr_code if qr_code.mode == 'RGBA' else None)
 
     output_buffer = BytesIO()
