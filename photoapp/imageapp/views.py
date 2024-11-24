@@ -10,8 +10,15 @@ from .serializers import PhotoSerializer, FrameSerializer
 from .utils import insert_photo_to_frame, create_qr_code, add_qr_code_to_image
 from rest_framework.reverse import reverse
 from django.http import HttpResponse
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
 
 
+@extend_schema_view(
+    post=extend_schema(
+        tags=['image'],
+        summary='Upload photo',
+    ),
+)
 class UploadPhotoView(APIView):
     def post(self, request, *args, **kwargs):
         frame_id = self.request.data.get('frame_id')
@@ -64,6 +71,22 @@ class UploadPhotoView(APIView):
             )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=['image'],
+        summary='Download photo',
+        responses={
+            200: OpenApiResponse(
+                response={"type": "string", "format": "binary"},
+                description="A downloadable photo file."
+            ),
+            404: OpenApiResponse(
+                response={"type": "string", "format": "binary"},
+                description="Photo not found."
+            ),
+        },
+    ),
+)
 class DownloadPhotoView(APIView):
     def get(self, request, pk, *args, **kwargs):
         try:
@@ -76,6 +99,12 @@ class DownloadPhotoView(APIView):
             return Response({"detail": "Photo not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
+@extend_schema_view(
+    post=extend_schema(
+        tags=['image'],
+        summary='Upload frame',
+    ),
+)
 class UploadFrameView(APIView):
     def post(self, request, *args, **kwargs):
         frame_serializer = FrameSerializer(
@@ -104,6 +133,12 @@ class UploadFrameView(APIView):
             )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=['image'],
+        summary='List frames',
+    ),
+)
 class ListFramesView(ListAPIView):
     serializer_class = FrameSerializer
     queryset = Frame.objects.all()
