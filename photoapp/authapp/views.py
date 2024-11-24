@@ -11,7 +11,7 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
 from .serializers import (
     MyTokenObtainPairSerializer,
     UsersListSerializer,
@@ -108,8 +108,14 @@ class UserRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
         summary='User invitation',
         request=InvitationSerializer,
         responses={
-            200: "Invitation sent successfully.",
-            400: "User with this email already exists or invalid data."
+            200: OpenApiResponse(
+                response={"type": "object", "properties": {"message": {"type": "string"}}},
+                description="Invitation sent successfully."
+            ),
+            400: OpenApiResponse(
+                response={"type": "object", "properties": {"message": {"type": "string"}}},
+                description="User with this email already exists or invalid data."
+            ),
         },
     ),
 )
@@ -174,9 +180,19 @@ class UserCreatePasswordView(APIView):
         description='Cancel an existing user invitation before they have accepted or activated their account.',
         request=EmailSerializer,
         responses={
-            200: "Invitation canceled successfully.",
-            404: "User with this email not found.",
-            400: "Invalid request, or user already activated.",
+            200: OpenApiResponse(
+                response={"type": "object", "properties": {"message": {"type": "string"}}},
+                description="Invitation canceled successfully."
+            ),
+
+            404: OpenApiResponse(
+                response={"type": "object", "properties": {"message": {"type": "string"}}},
+                description="User with this email not found."
+            ),
+            400: OpenApiResponse(
+                response={"type": "object", "properties": {"message": {"type": "string"}}},
+                description="Invalid request, or user already activated."
+            ),
         },
     ),
 )
@@ -204,9 +220,18 @@ class UserCancelInvitationView(APIView):
         description='Deactivate a user, preventing them from logging in.',
         request=EmailSerializer,
         responses={
-            200: "User deactivated successfully.",
-            404: "User with this email not found.",
-            400: "Invalid request.",
+            200: OpenApiResponse(
+                response={"type": "object", "properties": {"message": {"type": "string"}}},
+                description="User deactivated successfully."
+            ),
+            404: OpenApiResponse(
+                response={"type": "object", "properties": {"message": {"type": "string"}}},
+                description="User with this email not found."
+            ),
+            400: OpenApiResponse(
+                response={"type": "object", "properties": {"message": {"type": "string"}}},
+                description="Invalid request."
+            ),
         },
     ),
 )
