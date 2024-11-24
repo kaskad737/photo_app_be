@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import ShiftStart, ShiftEnd
 
-# Register your models here.
+admin.site.register(ShiftStart)
+admin.site.register(ShiftEnd)
