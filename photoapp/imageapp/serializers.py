@@ -12,4 +12,4 @@ class PhotoSerializer(serializers.ModelSerializer):
 class FrameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Frame
-        fields = ['id', 'frame', 'uploaded_by']
+        fields = ['id', 'frame', 'uploaded_by', 'restaurant']
