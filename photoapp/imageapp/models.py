@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 from authapp.models import User
+from workdayapp.models import Restaurant
 
 
 class Photo(models.Model):
@@ -20,6 +21,7 @@ class Frame(models.Model):
     frame = models.ImageField(upload_to='frames/')
     upload_time = models.DateTimeField(auto_now_add=True)
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='frames')
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='frames')
 
     def __str__(self):
         return self.frame.name
