@@ -110,7 +110,8 @@ class UploadFrameView(APIView):
         frame_serializer = FrameSerializer(
             data={
                 'frame': request.FILES.get('file'),
-                'uploaded_by': self.request.user.id
+                'uploaded_by': self.request.user.id,
+                'restaurant': self.request.data.get('restaurant')
             },
             context={'request': request}
         )
