@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ShiftStart, ShiftEnd
+from .models import ShiftStart, ShiftEnd, Restaurant
 
 
 class ShiftStartSerializer(serializers.ModelSerializer):
@@ -34,3 +34,9 @@ class ShiftEndSerializer(serializers.ModelSerializer):
             'timestamp'
         ]
         read_only_fields = ['timestamp']
+
+
+class RestaurantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Restaurant
+        fields = ['id', 'name']
