@@ -22,6 +22,7 @@ djangorestframework-simplejwt==5.3.1
 djoser==2.2.3
 drf-spectacular==0.27.2
 drf-yasg==1.21.7
+et_xmlfile==2.0.0
 exceptiongroup==1.2.1
 idna==3.6
 inflection==0.5.1
@@ -30,6 +31,7 @@ jsonschema==4.22.0
 jsonschema-specifications==2023.12.1
 kombu==5.3.5
 oauthlib==3.2.2
+openpyxl==3.1.5
 packaging==23.2
 pillow==10.4.0
 pluggy==1.5.0
