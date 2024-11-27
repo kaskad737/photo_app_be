@@ -2,11 +2,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from django.utils import timezone
-from .models import ShiftStart
-# , ShiftEnd
-from .serializers import ShiftStartSerializer, ShiftEndSerializer
+from .models import ShiftStart, Restaurant
+from .serializers import ShiftStartSerializer, ShiftEndSerializer, RestaurantSerializer
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from .utils import generate_excel_report
 
 
 @extend_schema_view(
@@ -134,3 +135,23 @@ class ShiftEndAPIView(APIView):
             serializer.save(timestamp=timezone.now())
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ExcelReportView(APIView):
+    def get(self, request):
+        # Пример данных
+        data = [
+            ["10:00 AM", "6:00 PM", "8:00", 100, 50, 500, 200, 700],
+            ["9:00 AM", "5:00 PM", "8:00", 120, 40, 600, 300, 900],
+        ]
+        return generate_excel_report(data)
+
+
+class RestaurantCreateView(CreateAPIView):
+    queryset = Restaurant.objects.all()
+    serializer_class = RestaurantSerializer
+
+
+class RestaurantListView(ListAPIView):
+    queryset = Restaurant.objects.all()
+    serializer_class = RestaurantSerializer
