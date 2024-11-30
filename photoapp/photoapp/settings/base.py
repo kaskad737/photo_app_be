@@ -170,3 +170,4 @@ AUTH_USER_MODEL = 'authapp.User'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 FE_HOST = 'http://localhost:8080'
+IMAGE_DOWNLOAD_PATH = 'image-download'
