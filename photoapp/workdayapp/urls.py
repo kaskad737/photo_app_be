@@ -1,5 +1,12 @@
 from django.urls import path
-from .views import ShiftStartAPIView, ShiftEndAPIView, ExcelReportView, RestaurantCreateView, RestaurantListView
+from .views import (
+    ShiftStartAPIView,
+    ShiftEndAPIView,
+    ExcelReportView,
+    RestaurantCreateView,
+    RestaurantListView,
+    RestaurantRetrieveView
+)
 
 app_name = 'workdayapp'
 
@@ -9,4 +16,5 @@ urlpatterns = [
     path("generate-report/", ExcelReportView.as_view(), name="generate-report"),
     path('restaurants/', RestaurantListView.as_view(), name='restaurant-list'),
     path('restaurants/register/', RestaurantCreateView.as_view(), name='restaurant-register'),
+    path('restaurants/<uuid:pk>/', RestaurantRetrieveView.as_view(), name='restaurant-details'),
 ]
