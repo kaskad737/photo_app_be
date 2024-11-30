@@ -9,6 +9,7 @@ class Photo(models.Model):
     photo = models.ImageField(upload_to='photos/')
     qrcode = models.ImageField(upload_to='qrcode/')
     photo_in_frame = models.ImageField(upload_to='photo_in_frame/')
+    photo_in_frame_with_qr_code = models.ImageField(upload_to='photo_in_frame_with_qr_code/')
     upload_time = models.DateTimeField(auto_now_add=True)
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='photos')
 
