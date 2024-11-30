@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from django.utils import timezone
 from .models import ShiftStart, Restaurant
 from .serializers import ShiftStartSerializer, ShiftEndSerializer, RestaurantSerializer
@@ -153,5 +153,10 @@ class RestaurantCreateView(CreateAPIView):
 
 
 class RestaurantListView(ListAPIView):
+    queryset = Restaurant.objects.all()
+    serializer_class = RestaurantSerializer
+
+
+class RestaurantRetrieveView(RetrieveAPIView):
     queryset = Restaurant.objects.all()
     serializer_class = RestaurantSerializer
