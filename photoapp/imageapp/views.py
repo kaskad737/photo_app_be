@@ -4,11 +4,10 @@ from django.http import FileResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from .models import Photo, Frame
-from .serializers import PhotoSerializer, FrameSerializer
+from .serializers import PhotoSerializer, FrameSerializer, ListPhotoSerializer, RetrievePhotoSerializer
 from .utils import insert_photo_to_frame, create_qr_code, add_qr_code_to_image
-from rest_framework.reverse import reverse
 from django.http import HttpResponse
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
 
@@ -34,8 +33,7 @@ class UploadPhotoView(APIView):
 
         if qs_serializer.is_valid() and frame_instance:
             photo_instance = qs_serializer.save()
-            download_url = reverse('imageapp:download-photo', args=[photo_instance.id])
-            absolute_download_url = request.build_absolute_uri(download_url)
+            download_url = f'{settings.FE_HOST}/{settings.IMAGE_DOWNLOAD_PATH}/{photo_instance.id}'
 
             # insert photo to our frame
             insert_photo_to_frame(
@@ -46,7 +44,7 @@ class UploadPhotoView(APIView):
             # create qr code for our frame and photo
             create_qr_code(
                 photo_instance=photo_instance,
-                absolute_download_url=absolute_download_url
+                absolute_download_url=download_url
             )
 
             # add qr code to our frame and photo
@@ -55,14 +53,6 @@ class UploadPhotoView(APIView):
             )
 
             return HttpResponse(photo_in_frame_with_qr_code_bytes, content_type="image/png")
-
-            # return Response(
-            #     {
-            #         'message': 'Media uploaded successfully.',
-            #         'data': qs_serializer.data,
-            #     },
-            #     status=status.HTTP_200_OK,
-            # )
 
         else:
             return Response(
@@ -107,11 +97,25 @@ class DownloadPhotoView(APIView):
 )
 class UploadFrameView(APIView):
     def post(self, request, *args, **kwargs):
+        restaurant_id = self.request.data.get('restaurant')
+
+        if Frame.objects.filter(restaurant_id=restaurant_id).exists():
+            return Response(
+                {
+                    'message': '''
+                        A frame for this restaurant already exists. You cannot upload a new one.
+                        You can delete it and upload new or update it.
+                    ''',
+                    'data': None,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         frame_serializer = FrameSerializer(
             data={
                 'frame': request.FILES.get('file'),
                 'uploaded_by': self.request.user.id,
-                'restaurant': self.request.data.get('restaurant')
+                'restaurant': restaurant_id
             },
             context={'request': request}
         )
@@ -143,3 +147,25 @@ class UploadFrameView(APIView):
 class ListFramesView(ListAPIView):
     serializer_class = FrameSerializer
     queryset = Frame.objects.all()
+
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=['image'],
+        summary='List photos',
+    ),
+)
+class ListPhotosView(ListAPIView):
+    serializer_class = ListPhotoSerializer
+    queryset = Photo.objects.all()
+
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=['image'],
+        summary='Retrieve photo',
+    ),
+)
+class RetrievePhotoView(RetrieveAPIView):
+    serializer_class = RetrievePhotoSerializer
+    queryset = Photo.objects.all()
