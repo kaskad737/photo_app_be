@@ -20,21 +20,18 @@ def insert_photo_to_frame(photo_instance, frame_path):
     x = (frame_width - target_width) // 2
     y = (frame_height - target_height) // 2
 
-    # Paste the photo onto the frame at the calculated position
     frame.paste(photo, (x, y), photo if photo.mode == 'RGBA' else None)
 
     temp_buffer = BytesIO()
     frame.save(temp_buffer, format='PNG')
     temp_buffer.seek(0)
 
-    # Save the image to the 'photo_in_frame' field of the Photo instance
     photo_instance.photo_in_frame.save(
         f"{photo_instance.id}_in_frame.png",
         ContentFile(temp_buffer.read()),
         save=False
     )
 
-    # Ensure to save the model instance after updating the field
     photo_instance.save()
 
 
@@ -51,7 +48,10 @@ def add_qr_code_to_image(photo_instance):
 
     output_buffer = BytesIO()
     framed_photo.save(output_buffer, format="PNG")
-    output_buffer.seek(0)  # Rewind the buffer to the beginning
+    output_buffer.seek(0)
+
+    file_name = f"{photo_instance.id}_with_qrcode.png"
+    photo_instance.photo_in_frame_with_qr_code.save(file_name, ContentFile(output_buffer.getvalue()), save=True)
 
     return output_buffer.getvalue()
 
