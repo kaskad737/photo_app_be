@@ -10,6 +10,7 @@ from .serializers import PhotoSerializer, FrameSerializer, ListPhotoSerializer, 
 from .utils import insert_photo_to_frame, create_qr_code, add_qr_code_to_image
 from django.http import HttpResponse
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 
 @extend_schema_view(
@@ -19,6 +20,8 @@ from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResp
     ),
 )
 class UploadPhotoView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
         frame_id = self.request.data.get('frame_id')
         frame_instance = Frame.objects.filter(id=frame_id).first()
@@ -78,6 +81,8 @@ class UploadPhotoView(APIView):
     ),
 )
 class DownloadPhotoView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, pk, *args, **kwargs):
         try:
             photo = Photo.objects.get(pk=pk)
@@ -96,6 +101,8 @@ class DownloadPhotoView(APIView):
     ),
 )
 class UploadFrameView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
     def post(self, request, *args, **kwargs):
         restaurant_id = self.request.data.get('restaurant')
 
@@ -145,6 +152,8 @@ class UploadFrameView(APIView):
     ),
 )
 class ListFramesView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
     serializer_class = FrameSerializer
     queryset = Frame.objects.all()
 
@@ -156,6 +165,7 @@ class ListFramesView(ListAPIView):
     ),
 )
 class ListPhotosView(ListAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = ListPhotoSerializer
     queryset = Photo.objects.all()
 
@@ -167,5 +177,6 @@ class ListPhotosView(ListAPIView):
     ),
 )
 class RetrievePhotoView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = RetrievePhotoSerializer
     queryset = Photo.objects.all()

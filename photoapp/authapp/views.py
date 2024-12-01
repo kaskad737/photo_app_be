@@ -75,7 +75,7 @@ class CustomTokenVerifyView(TokenVerifyView):
 class UsersListView(ListAPIView):
     serializer_class = UsersListSerializer
     queryset = User.objects.all().order_by('pk')
-    # permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
 
 @extend_schema_view(
@@ -120,6 +120,8 @@ class UserRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     ),
 )
 class UserInvitationView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
     def post(self, request, *args, **kwargs):
         serializer = InvitationSerializer(data=request.data)
         if serializer.is_valid():
@@ -150,6 +152,8 @@ class UserInvitationView(APIView):
     ),
 )
 class UserCreatePasswordView(APIView):
+    permission_classes = [AllowAny]
+
     def put(self, request):
         serializer = PasswordCheckAndSetSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -197,6 +201,8 @@ class UserCreatePasswordView(APIView):
     ),
 )
 class UserCancelInvitationView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
     def post(self, request, *args, **kwargs):
         serializer = EmailSerializer(data=request.data)
         if not serializer.is_valid():
@@ -236,6 +242,8 @@ class UserCancelInvitationView(APIView):
     ),
 )
 class UserDeactivateView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
     def post(self, request, *args, **kwargs):
         serializer = EmailSerializer(data=request.data)
         if not serializer.is_valid():
@@ -258,4 +266,4 @@ class UserDeactivateView(APIView):
 class UsersActiveListView(ListAPIView):
     serializer_class = UsersListSerializer
     queryset = User.objects.filter(is_active=True, is_superuser=False).order_by('pk')
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminUser]
